@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ECOR - Appointments & Meetings</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom styles for Inter font and general body aesthetics */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f4f8; /* Light background for the page */
+            color: #333;
+            line-height: 1.6;
+        }
+        /* Specific styles for the header gradient and text */
+        .header-gradient {
+            background: linear-gradient(to right, #2563eb, #3b82f6); /* Blue gradient for header */
+        }
+        /* Style for main content card */
+        .content-card {
+            background-color: #ffffff;
+            border-radius: 0.75rem; /* Rounded corners */
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1); /* Soft shadow */
+            border: 1px solid #e2e8f0; /* Subtle border for the card */
+        }
+        /* Style for tables to ensure good readability and spacing */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1.5rem;
+            border-radius: 0.5rem;
+            overflow: hidden; /* Ensures rounded corners apply to content */
+        }
+        th, td {
+            padding: 1rem 1.25rem;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0; /* Light border for rows */
+            /* Removed white-space: nowrap from td to allow content to wrap if needed */
+        }
+        th {
+            background-color: #4a67a0; /* Darker blue for header */
+            color: white;
+            font-weight: 600;
+            text-transform: uppercase; /* Ensure all-caps as per image */
+            font-size: 0.875rem; /* Smaller font for headers */
+            white-space: nowrap; /* Keep headers on one line */
+        }
+        tr:nth-child(even) {
+            background-color: #f8fafc; /* Slightly different background for even rows */
+        }
+        tr:hover {
+            background-color: #e2e8f0; /* Highlight on hover */
+        }
+        /* Style for buttons to match the example image */
+        .btn-primary {
+            background-color: #3b82f6; /* Blue */
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            transition: background-color 0.3s ease;
+        }
+        .btn-primary:hover {
+            background-color: #2563eb; /* Darker blue on hover */
+        }
+        .btn-secondary {
+            background-color: #cbd5e1; /* Light gray */
+            color: #475569; /* Darker text */
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            transition: background-color 0.3s ease;
+        }
+        .btn-secondary:hover {
+            background-color: #94a3b8; /* Darker gray on hover */
+        }
+
+        /* Input field styling to match dd-mm-yyyy placeholder */
+        .date-input {
+            border: 1px solid #cbd5e1;
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            color: #333;
+            width: 100%; /* Full width within its container */
+            max-width: 180px; /* Limit date input width */
+            background-color: white; /* Ensure white background for input */
+        }
+
+        /* Responsive adjustments for smaller screens */
+        @media (max-width: 768px) {
+            .content-card {
+                padding: 1rem; /* Adjust padding for smaller screens */
+            }
+            .date-filter-group {
+                flex-direction: column; /* Stack date filters vertically */
+                align-items: stretch;
+            }
+            .date-filter-group > div {
+                margin-bottom: 1rem; /* Add spacing between stacked items */
+            }
+            .date-filter-group button {
+                width: 100%; /* Full width buttons */
+            }
+            /* Make table cells stack and show label for mobile */
+            table, thead, tbody, th, td, tr {
+                display: block;
+            }
+            thead tr {
+                position: absolute;
+                top: -9999px;
+                left: -9999px;
+            }
+            tr {
+                border: 1px solid #e2e8f0;
+                margin-bottom: 0.75rem;
+                border-radius: 0.5rem;
+                padding: 0.5rem; /* Add some padding to rows */
+            }
+            td {
+                border: none;
+                position: relative;
+                padding-left: 50%;
+                text-align: right;
+                word-wrap: break-word; /* Allow content to wrap in cells */
+            }
+            td::before {
+                content: attr(data-label);
+                position: absolute;
+                left: 0;
+                width: 50%;
+                padding-left: 1rem;
+                font-weight: 600;
+                text-align: left;
+                white-space: nowrap;
+                color: #555;
+            }
+            /* Adjust input width for mobile */
+            .date-input {
+                max-width: none; /* Remove max-width on mobile to allow full width */
+            }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+    <!-- Header Section -->
+    <header class="header-gradient text-white p-4 shadow-lg">
+        <div class="container mx-auto flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <!-- Indian Railways Logo - Placeholder -->
+                <img src="https://placehold.co/50x50/333/FFF?text=Logo" alt="Indian Railways Logo" class="h-12 w-12 rounded-full shadow-md">
+                <h1 class="text-xl sm:text-2xl font-bold whitespace-nowrap">पूर्व तट रेलवे<br>( EAST COAST RAILWAY )</h1>
+            </div>
+            <a href="admin.html" class="bg-green-500 hover:bg-green-600 text-white px-5 py-2 rounded-lg shadow-md transition duration-300">Login</a>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="container mx-auto p-4 sm:p-6 flex-grow">
+        <section class="content-card p-6">
+            <h2 class="text-2xl font-semibold text-gray-800 mb-6 pb-2 border-b-2 border-blue-400">Appointments & Meetings</h2>
+
+            <!-- Date Filter Section -->
+            <div class="flex flex-col sm:flex-row items-center justify-start gap-4 mb-6 date-filter-group">
+                <div class="flex items-center gap-2 w-full sm:w-auto">
+                    <label for="fromDate" class="text-gray-700 font-medium whitespace-nowrap">From Date :</label>
+                    <input type="text" id="fromDate" placeholder="dd-mm-yyyy" class="date-input focus:ring-blue-500 focus:border-blue-500">
+                    <!-- Calendar icon placeholder, you might use a font icon or SVG here -->
+                    <span class="text-gray-500 text-xl hidden sm:inline">&#x1F4C5;</span> 
+                </div>
+                <div class="flex items-center gap-2 w-full sm:w-auto">
+                    <label for="toDate" class="text-gray-700 font-medium whitespace-nowrap">To Date :</label>
+                    <input type="text" id="toDate" placeholder="dd-mm-yyyy" class="date-input focus:ring-blue-500 focus:border-blue-500">
+                    <!-- Calendar icon placeholder -->
+                    <span class="text-gray-500 text-xl hidden sm:inline">&#x1F4C5;</span>
+                </div>
+                <button class="btn-primary flex-shrink-0">SHOW</button>
+                <button class="btn-secondary flex-shrink-0">CLEAR</button>
+            </div>
+
+            <!-- Table for Appointments & Meetings -->
+            <div id="meetings-table-container" class="overflow-x-auto">
+                <table class="min-w-full">
+                    <thead>
+                        <tr>
+                            <th>APPOINTMENT/MEETING DATE</th>
+                            <th>APPOINTMENT/MEETING TIME</th>
+                            <th>APPOINTMENT/MEETING WITH</th>
+                            <th>DESIGNATION</th>
+                            <th>PURPOSE</th>
+                            <th>VENUE</th>
+                        </tr>
+                    </thead>
+                    <tbody id="meetings-table-body">
+                        <!-- Data rows will be inserted here by JavaScript -->
+                        <tr>
+                            <td colspan="6" class="text-center text-gray-500 py-8">No appointment or meeting data available.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Filter Buttons for Days -->
+            <div class="flex flex-wrap justify-center gap-4 mt-8">
+                <button class="btn-secondary px-6 py-3">Today</button>
+                <button class="btn-secondary px-6 py-3">Tomorrow</button>
+                <button class="btn-secondary px-6 py-3">Other Days</button>
+                <button class="btn-secondary px-6 py-3">Past Days</button>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer Section -->
+    <footer class="bg-gray-800 text-white text-center p-4 mt-8">
+        <div class="container mx-auto text-sm">
+            <p>POWERED BY IT CENTRE/BBS/HQ</p>
+        </div>
+    </footer>
+
+    <script>
+        // Placeholder for future JavaScript interactions
+        // For example, handling date filtering and button clicks
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('Webpage structure loaded. Ready for data integration!');
+            // Your JavaScript code to dynamically populate data will go here later.
+        });
+    </script>
+</body>
+</html>
