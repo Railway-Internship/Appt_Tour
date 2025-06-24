@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>पूर्व तट रेलवे - Leave Management</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        /* Optional: Add custom styles if Tailwind alone isn't sufficient for exact match */
+        /* For example, if you want very specific font or element sizing not easily achievable with Tailwind classes */
+        body {
+            font-family: Arial, sans-serif; /* Example: ensure a common font */
+        }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans antialiased">
+
+    <header class="bg-blue-700 text-white p-4 flex justify-between items-center shadow-md">
+        <div class="flex items-center">
+            <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center mr-3 border-2 border-blue-500">
+                <svg class="w-10 h-10 text-blue-700" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm-8-8a8 8 0 1116 0 8 8 0 01-16 0z" clip-rule="evenodd"></path>
+                </svg>
+            </div>
+            <div>
+                <h1 class="text-2xl font-bold">पूर्व तट रेलवे</h1>
+                <p class="text-sm opacity-90">( EAST COAST RAILWAY )</p>
+            </div>
+        </div>
+        <div class="flex items-center space-x-4">
+            <span class="text-lg">Welcome, Admin User</span>
+            <span class="text-lg">ECR001</span>
+            <button class="bg-green-500 hover:bg-green-600 text-white px-5 py-2 rounded-md font-semibold transition duration-200 ease-in-out shadow-lg" id="logoutButton">Logout</button>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 py-8">
+
+        <div class="flex flex-col md:flex-row justify-between items-center mb-8 space-y-4 md:space-y-0 md:space-x-4">
+            <div class="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4 w-full md:w-auto">
+                <input type="text" placeholder="Search by employee name" class="p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 w-full md:w-80 transition duration-200 ease-in-out" id="searchInput">
+
+                <div class="relative w-full md:w-auto">
+                    <select class="block appearance-none w-full bg-white border border-gray-300 text-gray-700 py-3 px-5 pr-10 rounded-md leading-tight shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200 ease-in-out" id="statusFilter">
+                        <option value="All Status">All Status</option>
+                        <option value="Pending">Pending</option>
+                        <option value="Approved">Approved</option>
+                        <option value="Rejected">Rejected</option>
+                    </select>
+                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                        <svg class="fill-current h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+                    </div>
+                </div>
+
+                <div class="relative w-full md:w-auto">
+                    <select class="block appearance-none w-full bg-white border border-gray-300 text-gray-700 py-3 px-5 pr-10 rounded-md leading-tight shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200 ease-in-out" id="typeFilter">
+                        <option value="All Types">All Types</option>
+                        <option value="Annual">Annual</option>
+                        <option value="Sick">Sick</option>
+                        <option value="Casual">Casual</option>
+                        <option value="Maternity">Maternity</option>
+                    </select>
+                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                        <svg class="fill-current h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+                    </div>
+                </div>
+            </div>
+            <button class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-md flex items-center font-semibold shadow-lg transition duration-200 ease-in-out w-full md:w-auto justify-center md:justify-start" id="newLeaveButton">
+                <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                New Leave
+            </button>
+        </div>
+
+        <div id="leaveCardsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            </div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const leaveCardsContainer = document.getElementById('leaveCardsContainer');
+            const searchInput = document.getElementById('searchInput');
+            const statusFilter = document.getElementById('statusFilter');
+            const typeFilter = document.getElementById('typeFilter');
+            const newLeaveButton = document.getElementById('newLeaveButton');
+            const logoutButton = document.getElementById('logoutButton');
+
+            // Dummy data - EXACTLY as per the image
+            let leaveRequests = [
+                {
+                    id: 'ECR001',
+                    name: 'Rajesh Kumar',
+                    status: 'Pending',
+                    type: 'Annual',
+                    startDate: 'Mar 20',
+                    endDate: 'Mar 25, 2024',
+                    days: 6,
+                    appliedDate: 'Mar 05, 2024',
+                    reason: 'Family function and personal work',
+                    approvedBy: null
+                },
+                {
+                    id: 'ECR002',
+                    name: 'Priya Sharma',
+                    status: 'Approved',
+                    type: 'Sick',
+                    startDate: 'Mar 15',
+                    endDate: 'Mar 17, 2024',
+                    days: 3,
+                    appliedDate: 'Mar 10, 2024',
+                    reason: 'Medical treatment and recovery',
+                    approvedBy: 'Admin Officer'
+                },
+                {
+                    id: 'ECR003',
+                    name: 'Amit Patel',
+                    status: 'Rejected',
+                    type: 'Casual',
+                    startDate: 'Mar 12',
+                    endDate: 'Mar 12, 2024',
+                    days: 1,
+                    appliedDate: 'Mar 11, 2024',
+                    reason: 'Personal emergency',
+                    approvedBy: null
+                },
+                {
+                    id: 'ECR004',
+                    name: 'Sunita Devi',
+                    status: 'Approved',
+                    type: 'Maternity',
+                    startDate: '', // Not specified in image for Sunita Devi
+                    endDate: '',   // Not specified in image for Sunita Devi
+                    days: '',      // Not specified in image for Sunita Devi
+                    appliedDate: '', // Not specified in image for Sunita Devi
+                    reason: '',    // Not specified in image for Sunita Devi
+                    approvedBy: null // Not specified in image, assume null
+                }
+            ];
+
+            const renderLeaveCards = (requests) => {
+                leaveCardsContainer.innerHTML = ''; // Clear existing cards
+                requests.forEach(request => {
+                    // Determine status and type badge colors EXACTLY as in image
+                    const statusBadgeClass = {
+                        'Pending': 'bg-yellow-200 text-yellow-800',
+                        'Approved': 'bg-green-200 text-green-800',
+                        'Rejected': 'bg-red-200 text-red-800'
+                    }[request.status];
+
+                    const typeBadgeClass = {
+                        'Annual': 'bg-blue-200 text-blue-800',
+                        'Sick': 'bg-red-200 text-red-800',    // As in image for Priya Sharma
+                        'Casual': 'bg-green-200 text-green-800', // As in image for Amit Patel
+                        'Maternity': 'bg-purple-200 text-purple-800' // As in image for Sunita Devi
+                    }[request.type];
+
+                    // Determine card border color based on status
+                    const cardBorderColor = {
+                        'Pending': 'border-yellow-500',
+                        'Approved': 'border-green-500',
+                        'Rejected': 'border-red-500'
+                    }[request.status];
+
+                    const cardHtml = `
+                        <div class="bg-white p-6 rounded-lg shadow-lg border-t-4 ${cardBorderColor} ">
+                            <h2 class="text-xl font-semibold text-gray-800 mb-1">${request.name}</h2>
+                            <p class="text-gray-600 text-sm mb-4">${request.id}</p>
+
+                            <div class="flex flex-wrap gap-2 mb-4">
+                                <span class="px-3 py-1 rounded-full text-xs font-semibold ${statusBadgeClass}">${request.status}</span>
+                                <span class="px-3 py-1 rounded-full text-xs font-semibold ${typeBadgeClass}">${request.type}</span>
+                            </div>
+
+                            ${request.startDate && request.endDate ? `
+                                <div class="text-gray-700 text-sm mb-2 flex items-center">
+                                    <svg class="w-4 h-4 mr-2 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                                    <span>Mar ${request.startDate} – ${request.endDate}</span>
+                                </div>
+                            ` : ''}
+                            ${request.days ? `
+                                <div class="text-gray-700 text-sm mb-2 flex items-center">
+                                    <svg class="w-4 h-4 mr-2 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                    <span>${request.days} days</span>
+                                </div>
+                            ` : ''}
+                            ${request.appliedDate ? `
+                                <div class="text-gray-700 text-sm mb-3 flex items-center">
+                                    <svg class="w-4 h-4 mr-2 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                                    Applied: ${request.appliedDate}
+                                </div>
+                            ` : ''}
+                            ${request.approvedBy ? `
+                                <div class="text-gray-700 text-sm mb-3 flex items-center">
+                                    <svg class="w-4 h-4 mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                    Approved by: ${request.approvedBy}
+                                </div>
+                            ` : ''}
+                            ${request.reason ? `
+                                <p class="text-gray-800 text-base mt-2">${request.reason}</p>
+                            ` : ''}
+
+                            <div class="mt-6 pt-4 border-t border-gray-200 flex justify-between items-center">
+                                <button class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-md font-medium flex items-center transition duration-200 ease-in-out view-btn" data-id="${request.id}">
+                                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                                    View
+                                </button>
+                                <div class="flex space-x-2">
+                                    ${request.status === 'Pending' ? `
+                                        <button class="bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded-md font-medium shadow-md transition duration-200 ease-in-out approve-btn" data-id="${request.id}">Approve</button>
+                                        <button class="bg-red-600 hover:bg-red-700 text-white px-5 py-2 rounded-md font-medium shadow-md transition duration-200 ease-in-out reject-btn" data-id="${request.id}">Reject</button>
+                                    ` : `
+                                        <button class="bg-blue-50 hover:bg-blue-100 text-blue-700 px-3 py-2 rounded-md transition duration-200 ease-in-out edit-btn" data-id="${request.id}" title="Edit">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21H3v-3.5L15.232 5.232z"></path></svg>
+                                        </button>
+                                        <button class="bg-red-50 hover:bg-red-100 text-red-700 px-3 py-2 rounded-md transition duration-200 ease-in-out delete-btn" data-id="${request.id}" title="Delete">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                        </button>
+                                    `}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    leaveCardsContainer.innerHTML += cardHtml;
+                });
+            };
+
+            const filterAndSearch = () => {
+                const searchText = searchInput.value.toLowerCase();
+                const selectedStatus = statusFilter.value;
+                const selectedType = typeFilter.value;
+
+                const filteredRequests = leaveRequests.filter(request => {
+                    const matchesSearch = request.name.toLowerCase().includes(searchText) || request.id.toLowerCase().includes(searchText);
+                    const matchesStatus = selectedStatus === 'All Status' || request.status === selectedStatus;
+                    const matchesType = selectedType === 'All Types' || request.type === selectedType;
+                    return matchesSearch && matchesStatus && matchesType;
+                });
+                renderLeaveCards(filteredRequests);
+            };
+
+            // Event Listeners for Filters and Search
+            searchInput.addEventListener('input', filterAndSearch);
+            statusFilter.addEventListener('change', filterAndSearch);
+            typeFilter.addEventListener('change', filterAndSearch);
+
+            // Initial render of all leave requests
+            renderLeaveCards(leaveRequests);
+
+            // Event Delegation for Button Clicks on Leave Cards
+            leaveCardsContainer.addEventListener('click', (event) => {
+                const target = event.target;
+                const button = target.closest('button'); // Get the closest button ancestor
+                if (!button) return; // Not a button click
+
+                const id = button.dataset.id;
+                if (!id) return; // Button doesn't have a data-id
+
+                const requestIndex = leaveRequests.findIndex(req => req.id === id);
+                if (requestIndex === -1) return; // Request not found
+
+                if (button.classList.contains('approve-btn')) {
+                    console.log(`Approving leave request for ID: ${id}`);
+                    leaveRequests[requestIndex].status = 'Approved';
+                    leaveRequests[requestIndex].approvedBy = 'Admin Officer'; // As shown for Priya Sharma
+                    renderLeaveCards(leaveRequests); // Re-render to update UI
+                } else if (button.classList.contains('reject-btn')) {
+                    console.log(`Rejecting leave request for ID: ${id}`);
+                    leaveRequests[requestIndex].status = 'Rejected';
+                    leaveRequests[requestIndex].approvedBy = null; // Clear approvedBy if rejected
+                    renderLeaveCards(leaveRequests); // Re-render to update UI
+                } else if (button.classList.contains('view-btn')) {
+                    console.log(`Viewing details for leave request ID: ${id}`);
+                    // You could implement a modal or redirect here for a real view
+                    alert(`Viewing details for leave request for ${leaveRequests[requestIndex].name} (ID: ${id})\nReason: ${leaveRequests[requestIndex].reason || 'No reason provided.'}`);
+                } else if (button.classList.contains('edit-btn')) {
+                    console.log(`Editing leave request for ID: ${id}`);
+                    alert(`Editing leave request for ${leaveRequests[requestIndex].name} (ID: ${id})\n(This would open an edit form/modal)`);
+                } else if (button.classList.contains('delete-btn')) {
+                    console.log(`Deleting leave request for ID: ${id}`);
+                    if (confirm(`Are you sure you want to delete the leave request for ${leaveRequests[requestIndex].name} (ID: ${id})? This action cannot be undone.`)) {
+                        leaveRequests.splice(requestIndex, 1); // Remove the item from the array
+                        renderLeaveCards(leaveRequests); // Re-render to show the updated list
+                    }
+                }
+            });
+
+            // New Leave Button functionality
+            newLeaveButton.addEventListener('click', () => {
+                alert('Opening form to submit a new leave request...');
+                console.log('New Leave button clicked');
+                // In a real app, this would open a modal or navigate to a new form page.
+            });
+
+            // Logout Button functionality
+            logoutButton.addEventListener('click', () => {
+                alert('Logging out...');
+                console.log('Logout button clicked');
+                // In a real app, this would clear session/token and redirect to login page.
+            });
+        });
+    </script>
+</body>
+</html>

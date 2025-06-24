@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Appointments & Meetings</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        /* Custom CSS Variables for a cohesive theme */
+        :root {
+            --primary-color: #1ABC9C; /* Changed to vibrant Teal Blue */
+            --secondary-color: #007bff; /* A standard blue for secondary elements */
+            --accent-color: #ffc107; /* A gold/yellow for highlights or alerts */
+            --background-light: #f8f9fa; /* Lighter background */
+            --card-background: #ffffff;
+            --dark-text: #212529; /* Darker text for better readability */
+            --medium-text: #495057; /* Medium gray for labels/descriptions */
+            --light-text: #adb5bd; /* Lighter gray for borders/placeholders */
+            --border-light: #dee2e6; /* Standard light border */
+            --table-header-bg: #e9ecef; /* Slightly darker light gray for table header */
+            
+            /* --- NEW MODERN MODAL COLORS & DESIGN --- */
+            --modal-gradient-start: #ECF0F1; /* Changed to Light Gray-Blue */
+            --modal-gradient-end: #ECF0F1; /* Changed to Light Gray-Blue */
+            --modal-heading-bg: #34495E; /* Changed to Darker Blue/Indigo */
+            --input-background: #ffffff; /* Pure white for inputs within modals */
+            /* --- END NEW MODERN MODAL COLORS & DESIGN --- */
+
+            --input-border: #ced4da; /* Standard input border */
+            --input-focus-border: #80bdff; /* Standard blue focus border */
+            --button-primary-bg: var(--primary-color);
+            --button-primary-hover-bg: #16A085; /* Darker shade of new primary color */
+            --button-secondary-bg: #6c757d; /* Gray for secondary button */
+            --button-secondary-hover-bg: #5a6268;
+            --view-btn-color: #17a2b8; /* Info blue for view */
+            --edit-btn-color: #ffc107; /* Yellow for edit */
+            --logout-btn-color: #dc3545; /* Red for logout */
+
+            /* Summary Card Specific Pastel Colors - Not very light */
+            --summary-blue-bg: #BBDEFB; /* Light Blue 200 */
+            --summary-blue-text: #1565c0; /* Blue 800 */
+
+            --summary-purple-bg: #E1BEE7; /* Light Purple 200 */
+            --summary-purple-text: #6A1B9A; /* Purple 800 */
+
+            --summary-peach-bg: #FFCCBC; /* Light Orange 200 / Peach */
+            --summary-peach-text: #D84315; /* Deep Orange 800 */
+
+            --summary-teal-bg: #B2DFDB; /* Light Teal 200 */
+            --summary-teal-text: #00695C; /* Teal 800 */
+
+            /* Status Badges - Pastel but visible */
+            --status-leave-bg: #ffe0b2; /* Light orange for leave */
+            --status-leave-text: #e65100; /* Darker orange text */
+            --status-duty-bg: #c8e6c9; /* Light green for duty */
+            --status-duty-text: #1b5e20; /* Darker green text */
+        }
+
+        body {
+            font-family: "Inter", sans-serif;
+            background-color: var(--background-light);
+            color: var(--dark-text);
+        }
+
+        /* Modal Overlay */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow-y: auto;
+            background-color: rgba(0,0,0,0.7); /* Softer overlay */
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(8px); /* Subtle blur */
+            padding: 1rem; /* Consistent padding */
+        }
+
+        /* Modal Content Box */
+        .modal-content {
+            background: linear-gradient(135deg, var(--modal-gradient-start) 0%, var(--modal-gradient-end) 100%);
+            padding: 0; /* Remove padding here, will add to inner elements */
+            border-radius: 1.5rem; /* More pronounced rounded corners (24px) */
+            box-shadow: 0 25px 50px rgba(0,0,0,0.2), 0 0 10px rgba(0,0,0,0.05) inset; /* Richer, multi-layer shadow */
+            width: 90%;
+            max-width: 550px; /* Slightly larger max-width for better content display */
+            position: relative;
+            transform: translateY(-50px) scale(0.95); /* Adjusted animation start */
+            opacity: 0;
+            transition: transform 0.6s cubic-bezier(0.22, 0.61, 0.36, 1), opacity 0.6s ease-in-out;
+            border: 1px solid rgba(220, 220, 220, 0.6); /* Soft, subtle border */
+            box-sizing: border-box;
+            max-height: 85vh; /* Ensure modal height is less than viewport height */
+            overflow-y: auto;
+        }
+
+        .modal.open .modal-content {
+            transform: translateY(0) scale(1);
+            opacity: 1;
+        }
+
+        /* Modal Heading Styling */
+        .modal-content h3 {
+            background-color: var(--modal-heading-bg); /* Changed to Darker Blue/Indigo */
+            color: white; /* Changed text color to white for contrast against blue heading */
+            /* Adjusted padding to push heading and close button down slightly */
+            padding: 1.5rem 3.5rem 1.5rem 2rem; /* Increased top and bottom padding */
+            margin-bottom: 0; /* Remove default bottom margin */
+            border-top-left-radius: 1.4rem; /* Match modal border radius - slightly less to account for modal border */
+            border-top-right-radius: 1.4rem; /* Match modal border radius - slightly less to account for modal border */
+            font-size: 1.75rem; /* Adjusted font size to give more space */
+            font-weight: 700; /* Bolder font */
+            border-bottom: 1px solid rgba(0,0,0,0.08); /* Subtle separator line */
+            box-shadow: inset 0 -1px 3px rgba(0,0,0,0.03); /* Very subtle inner shadow */
+            line-height: 1.2; /* Adjust line height for better appearance with new font size */
+            display: flex; /* Enable flexbox for vertical alignment */
+            align-items: center; /* Vertically center content */
+            justify-content: space-between; /* Space out title and close button */
+            padding-right: 2rem; /* Adjust right padding to account for close button */
+        }
+
+        /* Modal Body Content Area */
+        .modal-content .modal-body-content {
+            padding: 2rem; /* Padding for the main content area */
+        }
+
+        /* Close Button - Completely redesigned based on new image */
+        .close-button {
+            color: var(--medium-text); /* Darker gray for visibility */
+            font-size: 1.5rem; /* Clear icon size */
+            font-weight: bold; /* Keep bold for the cross */
+            cursor: pointer;
+            transition: all 0.3s ease-in-out;
+            border-radius: 50%; /* Still circular */
+            width: 2rem; /* Adjusted size */
+            height: 2rem; /* Adjusted size */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #ffffff; /* Opaque white background */
+            border: 1px solid rgba(0, 0, 0, 0.15); /* More prominent, slightly darker border */
+            box-shadow: 0 1px 2px rgba(0,0,0,0.08); /* Softer, more subtle shadow */
+            text-decoration: none;
+            z-index: 1010;
+            outline: none; /* Remove focus outline */
+            margin-left: 1rem; /* Space from the title */
+            /* Added margin-top to push it down slightly, aligning with new heading padding */
+            margin-top: 0; /* Ensures it aligns with the flexbox changes */
+        }
+        .close-button:hover,
+        .close-button:focus {
+            color: #dc3545; /* Danger red on hover */
+            background-color: #ffeff0; /* Very light red background on hover */
+            border-color: #dc3545; /* Red border on hover */
+            box-shadow: 0 2px 6px rgba(220, 53, 69, 0.25); /* More pronounced red shadow */
+            transform: scale(1.08); /* Gentle scale */
+        }
+
+        /* Form Labels */
+        .modal-content label {
+            font-weight: 600;
+            color: var(--medium-text);
+            margin-bottom: 0.2rem;
+            display: block;
+            font-size: 0.9rem;
+        }
+
+        /* Form Inputs - Different background for input sections */
+        .modal-content input[type="text"],
+        .modal-content input[type="datetime-local"],
+        .modal-content select,
+        .modal-content textarea {
+            border: 1px solid var(--input-border);
+            border-radius: 0.5rem; /* 8px rounded */
+            padding: 0.5rem 0.8rem; /* Adjusted padding */
+            background-color: var(--input-background); /* Pure white for inputs */
+            transition: all 0.3s ease-in-out;
+            width: 100%;
+            font-size: 0.95rem;
+            color: var(--dark-text);
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.05); /* Inner shadow for depth */
+        }
+        .modal-content input[type="text"]:focus,
+        .modal-content input[type="datetime-local"]:focus,
+        .modal-content select:focus,
+        .modal-content textarea:focus {
+            border-color: var(--input-focus-border);
+            outline: none;
+            box-shadow: 0 0 0 4px rgba(41, 128, 185, 0.2), inset 0 1px 3px rgba(0,0,0,0.08); /* Softer blue glow */
+            background-color: #ffffff; /* White on focus for clarity */
+        }
+
+        /* Modal Buttons */
+        .modal-content .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--button-primary-hover-bg) 100%);
+            color: white;
+            padding: 0.6rem 1.5rem;
+            border-radius: 0.6rem;
+            font-weight: 600;
+            transition: all 0.3s ease-in-out;
+            box-shadow: 0 4px 15px rgba(26, 188, 156, 0.3); /* Adjusted shadow for new primary color */
+            letter-spacing: 0.03em;
+            text-transform: uppercase;
+            border: none;
+            cursor: pointer;
+        }
+        .modal-content .btn-primary:hover {
+            background: linear-gradient(135deg, var(--button-primary-hover-bg) 0%, var(--primary-color) 100%);
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 6px 20px rgba(26, 188, 156, 0.4); /* Adjusted shadow for new primary color */
+        }
+
+        .modal-content .btn-secondary {
+            background-color: var(--button-secondary-bg);
+            color: white; 
+            padding: 0.6rem 1.5rem;
+            border-radius: 0.6rem;
+            font-weight: 600;
+            transition: all 0.3s ease-in-out;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            letter-spacing: 0.03em;
+            text-transform: uppercase;
+            border: none;
+            cursor: pointer;
+        }
+        .modal-content .btn-secondary:hover {
+            background-color: var(--button-secondary-hover-bg);
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+        }
+
+        /* Main Heading Container Styling */
+        .main-heading-container {
+            background: var(--secondary-color); /* Changed to solid blue */
+            color: white;
+            padding: 1.2rem 2.5rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+            font-size: 2.25rem;
+            font-weight: 700;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+            letter-spacing: 0.04em;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            transition: all 0.3s ease-in-out;
+            margin-bottom: 1.5rem;
+        }
+        .main-heading-container:hover {
+            transform: translateY(-3px) scale(1.005);
+            box-shadow: 0 10px 22px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Add Button inside heading */
+        #addAppointmentBtn { /* Changed ID */
+            background-color: var(--accent-color); /* Accent yellow for add button */
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 1.5rem;
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            white-space: nowrap;
+            gap: 0.4rem;
+            transition: all 0.3s ease-in-out;
+            box-shadow: 0 2px 8px rgba(255, 193, 7, 0.3); /* Yellow shadow based on accent-color */
+            border: none;
+            cursor: pointer;
+        }
+        #addAppointmentBtn:hover { /* Changed ID */
+            background-color: #e0a800; /* Darker yellow on hover */
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(255, 193, 7, 0.4);
+        }
+        #addAppointmentBtn i { /* Changed ID */
+            font-size: 1rem;
+        }
+
+        /* Filter Section Styling */
+        .filter-section {
+            background-color: var(--table-header-bg);
+            padding: 1.5rem;
+            border-radius: 1rem;
+            box-shadow: inset 0 1px 5px rgba(0,0,0,0.05);
+            border: 1px solid var(--border-light);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+        .filter-section label {
+            color: var(--dark-text);
+            font-weight: 600;
+            font-size: 1rem;
+        }
+        .filter-section input[type="date"],
+        .filter-section input[type="text"] {
+            padding: 0.6rem 0.9rem;
+            border: 1px solid var(--input-border);
+            border-radius: 0.5rem;
+            background-color: var(--card-background);
+            font-size: 0.95rem;
+            color: var(--dark-text);
+            transition: all 0.3s ease;
+        }
+        .filter-section input[type="date"]:focus,
+        .filter-section input[type="text"]:focus {
+            outline: none;
+            border-color: var(--input-focus-border);
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.3); /* Blue glow based on secondary-color */
+        }
+        .filter-section button {
+            background-color: var(--secondary-color); /* Use secondary blue for filter buttons */
+            color: white;
+            padding: 0.6rem 1.2rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+            border: none;
+            cursor: pointer;
+        }
+        .filter-section button:hover {
+            background-color: #0069d9; /* Darker blue on hover */
+            transform: translateY(-1px);
+            box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+        }
+
+        /* Table Styling */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            border-radius: 1rem;
+            overflow: hidden;
+        }
+        thead {
+            background-color: var(--table-header-bg);
+        }
+        th {
+            padding: 1rem 1.5rem;
+            text-align: left;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--secondary-color); /* Text color for table headers */
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border-bottom: 1px solid var(--border-light);
+        }
+        tbody {
+            background-color: var(--card-background);
+        }
+        tbody tr {
+            transition: background-color 0.2s ease;
+            border-bottom: 1px solid var(--border-light);
+        }
+        tbody tr:last-child {
+            border-bottom: none;
+        }
+        tbody tr:hover {
+            background-color: var(--background-light);
+        }
+        td {
+            padding: 1rem 1.5rem;
+            font-size: 0.9rem;
+            color: var(--dark-text);
+            word-wrap: break-word; /* Ensure long words break */
+        }
+        /* Status Badges */
+        td span.rounded-full {
+            font-weight: 600;
+            font-size: 0.75rem;
+            padding: 0.25rem 0.7rem;
+            text-transform: capitalize;
+        }
+        /* Adjusted badge colors for better contrast */
+        .bg-orange-100 { background-color: var(--status-leave-bg); }
+        .text-orange-800 { color: var(--status-leave-text); }
+        .bg-green-100 { background-color: var(--status-duty-bg); }
+        .text-green-800 { color: var(--status-duty-text); }
+
+        /* Action Buttons in table */
+        .view-btn, .edit-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0.4rem;
+            border-radius: 0.4rem;
+            transition: all 0.2s ease-in-out;
+            color: inherit;
+        }
+        .view-btn:hover {
+            color: #117a8b; /* Darker info blue */
+            background-color: rgba(23, 162, 184, 0.1);
+            transform: scale(1.1);
+        }
+        .edit-btn:hover {
+            color: #d39e00; /* Darker yellow */
+            background-color: rgba(255, 193, 7, 0.1);
+            transform: scale(1.1);
+        }
+        .action-icons {
+            font-size: 1.1rem;
+        }
+
+        /* Summary Section Styling */
+        .summary-card {
+            background: var(--card-background);
+            padding: 1.2rem;
+            border-radius: 0.8rem;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.1);
+            width: 100%;
+            transition: all 0.3s ease-in-out;
+            border: 1px solid var(--border-light);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        .summary-card:hover {
+            transform: translateY(-3px) scale(1.01);
+            box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+        }
+        .summary-card p.text-2xl {
+            font-size: 2.2rem;
+            font-weight: 800; /* Made text bolder */
+            margin-bottom: 0.3rem;
+            line-height: 1;
+        }
+        .summary-card p.text-sm {
+            font-size: 0.85rem;
+            color: var(--dark-text); /* Made text darker for better visibility */
+            font-weight: 600; /* Made text bolder */
+        }
+        /* Specific colors for summary cards - adjusted for normal appearance */
+        .summary-card.bg-blue-100 { background-color: var(--summary-blue-bg); }
+        .summary-card.text-blue-800 { color: var(--summary-blue-text); }
+        
+        /* New classes for distinct colors */
+        .summary-card.bg-purple-100 { background-color: var(--summary-purple-bg); }
+        .summary-card.text-purple-800 { color: var(--summary-purple-text); }
+
+        .summary-card.bg-peach-100 { background-color: var(--summary-peach-bg); }
+        .summary-card.text-peach-800 { color: var(--summary-peach-text); }
+
+        .summary-card.bg-teal-100 { background-color: var(--summary-teal-bg); }
+        .summary-card.text-teal-800 { color: var(--summary-teal-text); }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <header class="bg-white p-4 text-gray-800 flex items-center justify-between shadow-lg border-b border-gray-200">
+        <div class="flex items-center space-x-4">
+            <img src="https://placehold.co/50x50/F3F4F6/1F2937?text=ECR" alt="Logo" class="rounded-full border-2 border-gray-300">
+            <div>
+                <h1 class="text-2xl font-bold">पूर्व तट रेलवे</h1>
+                <p class="text-sm opacity-90">( EAST COAST RAILWAY )</p>
+            </div>
+        </div>
+        <div class="text-right flex items-center space-x-4">
+            <div>
+                <p class="text-sm">Welcome, User</p>
+                <p class="text-sm font-semibold">ECR001</p>
+            </div>
+            <button class="bg-red-600 hover:bg-red-700 text-white font-semibold py-1.5 px-4 rounded-full shadow-md transition duration-300 ease-in-out transform hover:scale-105">Logout</button>
+        </div>
+    </header>
+
+    <main class="flex-grow p-8 bg-gray-100">
+        <div>
+            <div class="main-heading-container">
+                <h2 class="text-3xl font-extrabold text-white">Appointments & Meetings</h2>
+                <!-- Removed Add Appointment button -->
+            </div>
+
+            <div class="filter-section">
+                <label for="fromDate">From Date :</label>
+                <input type="date" id="fromDate">
+                <label for="toDate">To Date :</label>
+                <input type="date" id="toDate">
+                <label for="officerSearch">Appointment With / Officer Name :</label>
+                <input type="text" id="officerSearch" placeholder="Search by name...">
+                <button id="showFilterBtn">SHOW</button>
+                <button id="clearFilterBtn">CLEAR</button>
+            </div>
+
+            <div class="overflow-x-auto rounded-lg border border-gray-300 shadow-md">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Appointment / Meeting Date</th>
+                            <th>Appointment / Meeting Time</th>
+                            <th>Appointment / Meeting With</th>
+                            <th>Designation</th>
+                            <th>Purpose</th>
+                            <th>Venue</th>
+                            <!-- Removed Actions column header -->
+                        </tr>
+                    </thead>
+                    <tbody id="appointmentsTableBody">
+                        </tbody>
+                </table>
+                <div id="noDataMessage" class="hidden text-center py-4 text-gray-500">No appointments found for the selected criteria.</div>
+            </div>
+
+            <div class="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 text-center">
+                <div class="summary-card bg-blue-100 text-blue-800">
+                    <p id="todayAppointmentsCount" class="text-blue-800">0</p>
+                    <p class="text-sm">Today</p>
+                </div>
+                <div class="summary-card bg-purple-100 text-purple-800">
+                    <p id="tomorrowAppointmentsCount" class="text-purple-800">0</p>
+                    <p class="text-sm">Tomorrow</p>
+                </div>
+                <div class="summary-card bg-peach-100 text-peach-800">
+                    <p id="otherDaysAppointmentsCount" class="text-peach-800">0</p>
+                    <p class="text-sm">Other Days</p>
+                </div>
+                <div class="summary-card bg-teal-100 text-teal-800">
+                    <p id="pastAppointmentsCount" class="text-teal-800">0</p>
+                    <p class="text-sm">Past Days</p>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Removed View Modal -->
+    <!-- Removed Edit Modal -->
+    <!-- Removed Add Modal -->
+
+    <script>
+        // Sample data for demonstration
+        let appointments = [
+            {
+                id: 1,
+                appointmentDate: "2025-05-25",
+                appointmentTime: "15:30",
+                appointmentWith: "All PHODs, DRMs",
+                designation: "Chief Works Engineer",
+                purpose: "Weekly Safety & Rev. Mtg. (ONLY SAFETY ISSUES WILL BE DISCUSSED)",
+                venue: "Chhajan Kalkala"
+            },
+            {
+                id: 2,
+                appointmentDate: "2025-05-31", // Changed to match example (tomorrow relative to 2025-05-30)
+                appointmentTime: "16:30",
+                appointmentWith: "CPEECRO Department Heads",
+                designation: "Chief Engineer Research & Development",
+                purpose: "Safety Review Meeting",
+                venue: "Chhajan Kalkala"
+            },
+            {
+                id: 3,
+                appointmentDate: "2025-06-05",
+                appointmentTime: "11:00",
+                appointmentWith: "ECORSU Members",
+                designation: "Divisional Signal & Telecom Engineer / Projects",
+                purpose: "Annual General Meeting",
+                venue: "CUTTACK"
+            },
+            {
+                id: 4,
+                appointmentDate: "2025-06-12",
+                appointmentTime: "09:00",
+                appointmentWith: "ECORSU Representatives",
+                designation: "Chief Electrical Signal Engineer / Planning",
+                purpose: "Performance Monitoring Meeting",
+                venue: "Sakhia Griha"
+            },
+            {
+                id: 5,
+                appointmentDate: "2025-06-13",
+                appointmentTime: "09:00",
+                appointmentWith: "ECORSU Representatives",
+                designation: "Principal Chief Medical Director",
+                purpose: "PMM Mtg. with ECORSU",
+                venue: "Sakhia Griha"
+            },
+            {
+                id: 6,
+                appointmentDate: "2025-06-23", // Example past date
+                appointmentTime: "10:00",
+                appointmentWith: "Past Attendee",
+                designation: "Retired Officer",
+                purpose: "Farewell Meeting",
+                venue: "Headquarters"
+            },
+            {
+                id: 7,
+                appointmentDate: "2025-07-01", // Example future date
+                appointmentTime: "14:00",
+                appointmentWith: "Future Partner",
+                designation: "Consultant",
+                purpose: "Project Discussion",
+                venue: "Online"
+            }
+        ];
+
+        // Get modal elements (These are now removed, but keeping variables for function calls that still exist)
+        const viewModal = document.getElementById('viewModal'); // Will be null
+        const editModal = document.getElementById('editModal'); // Will be null
+        const addModal = document.getElementById('addModal'); // Will be null
+
+        // Get buttons (Add button removed)
+        // const addAppointmentBtn = document.getElementById('addAppointmentBtn'); // Removed
+        const appointmentsTableBody = document.getElementById('appointmentsTableBody');
+        const showFilterBtn = document.getElementById('showFilterBtn');
+        const clearFilterBtn = document.getElementById('clearFilterBtn');
+        const fromDateInput = document.getElementById('fromDate');
+        const toDateInput = document.getElementById('toDate');
+        const officerSearchInput = document.getElementById('officerSearch');
+        const noDataMessage = document.getElementById('noDataMessage');
+
+        // Get forms (Removed forms associated with modals)
+        // const editForm = document.getElementById('editForm'); // Removed
+        // const addForm = document.getElementById('addForm'); // Removed
+
+        let currentEditId = null; // No longer used for view/edit functionality
+
+        // Function to open a modal (No longer used as modals are removed)
+        function openModal(modal) {
+            // No action needed as modals are removed
+            console.warn("Attempted to open a modal, but modals are currently disabled/removed.");
+        }
+
+        // Function to close a modal (No longer used as modals are removed)
+        function closeModal(modal) {
+            // No action needed as modals are removed
+            console.warn("Attempted to close a modal, but modals are currently disabled/removed.");
+        }
+
+        // Close modals when clicking outside (No longer needed)
+        window.removeEventListener('click', (event) => { /* Removed event listener */ });
+
+        // Function to format date for display (DD.MM.YYYY)
+        function formatDateForDisplay(dateString) {
+            const [year, month, day] = dateString.split('-');
+            return `${day}.${month}.${year}`;
+        }
+
+        // Function to render table rows
+        function renderTable(appointmentsToRender = appointments) {
+            appointmentsTableBody.innerHTML = ''; // Clear existing rows
+            if (appointmentsToRender.length === 0) {
+                noDataMessage.classList.remove('hidden');
+            } else {
+                noDataMessage.classList.add('hidden');
+            }
+
+            appointmentsToRender.forEach(appointment => {
+                const row = document.createElement('tr');
+                row.classList.add('hover:bg-gray-50');
+
+                row.innerHTML = `
+                    <td class="px-6 py-4 text-sm text-gray-800">${formatDateForDisplay(appointment.appointmentDate)}</td>
+                    <td class="px-6 py-4 text-sm text-gray-800">${appointment.appointmentTime}</td>
+                    <td class="px-6 py-4 text-sm text-gray-800">${appointment.appointmentWith}</td>
+                    <td class="px-6 py-4 text-sm text-gray-800">${appointment.designation || 'N/A'}</td>
+                    <td class="px-6 py-4 text-sm text-gray-800">${appointment.purpose}</td>
+                    <td class="px-6 py-4 text-sm text-gray-800">${appointment.venue}</td>
+                    <!-- Removed action buttons (eye, pencil) -->
+                `;
+                appointmentsTableBody.appendChild(row);
+            });
+
+            // Removed calls to attachTableButtonListeners since buttons are removed
+            updateSummaryCounts(); // Update summary counts after rendering table
+        }
+
+        // Removed attachTableButtonListeners function as buttons are removed
+        // Removed handleViewClick function as view button is removed
+        // Removed handleEditClick function as edit button is removed
+        // Removed addTourLeaveBtn.addEventListener as add button is removed
+        // Removed editForm.addEventListener as edit form is removed
+        // Removed addForm.addEventListener as add form is removed
+
+
+        // Date & Officer Filtering Logic
+        function applyFilters() {
+            const fromDateStr = fromDateInput.value;
+            const toDateStr = toDateInput.value;
+            const officerSearchTerm = officerSearchInput.value.toLowerCase();
+
+            let filteredAppointments = appointments;
+
+            if (fromDateStr && toDateStr) {
+                const filterFromDate = new Date(fromDateStr);
+                const filterToDate = new Date(toDateStr);
+                filterToDate.setHours(23, 59, 59, 999); // Include the whole "to date"
+
+                filteredAppointments = filteredAppointments.filter(appointment => {
+                    const appointmentDate = new Date(appointment.appointmentDate);
+                    appointmentDate.setHours(0, 0, 0, 0);
+
+                    return (appointmentDate >= filterFromDate && appointmentDate <= filterToDate);
+                });
+            }
+
+            if (officerSearchTerm) {
+                filteredAppointments = filteredAppointments.filter(appointment =>
+                    appointment.appointmentWith.toLowerCase().includes(officerSearchTerm) ||
+                    appointment.designation.toLowerCase().includes(officerSearchTerm) ||
+                    appointment.purpose.toLowerCase().includes(officerSearchTerm) ||
+                    appointment.venue.toLowerCase().includes(officerSearchTerm)
+                );
+            }
+            renderTable(filteredAppointments);
+        }
+
+        showFilterBtn.addEventListener('click', applyFilters);
+
+        clearFilterBtn.addEventListener('click', () => {
+            fromDateInput.value = '';
+            toDateInput.value = '';
+            officerSearchInput.value = '';
+            renderTable(); // Render all appointments
+        });
+
+        // Summary Counts Logic
+        function updateSummaryCounts() {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0); // Normalize to start of day
+
+            const tomorrow = new Date(today);
+            tomorrow.setDate(tomorrow.getDate() + 1); // Start of tomorrow
+
+            let todayCount = 0;
+            let tomorrowCount = 0;
+            let otherDaysCount = 0; // For appointments in the future beyond tomorrow
+            let pastDaysCount = 0; // For appointments in the past
+
+            appointments.forEach(appointment => {
+                const apptDate = new Date(appointment.appointmentDate);
+                apptDate.setHours(0, 0, 0, 0); // Normalize appointment date to start of day
+
+                if (apptDate.getTime() === today.getTime()) {
+                    todayCount++;
+                } else if (apptDate.getTime() === tomorrow.getTime()) {
+                    tomorrowCount++;
+                } else if (apptDate > tomorrow) { // Strictly after tomorrow
+                    otherDaysCount++;
+                } else if (apptDate < today) { // Strictly before today
+                    pastDaysCount++;
+                }
+            });
+
+            document.getElementById('todayAppointmentsCount').textContent = todayCount;
+            document.getElementById('tomorrowAppointmentsCount').textContent = tomorrowCount;
+            document.getElementById('otherDaysAppointmentsCount').textContent = otherDaysCount;
+            document.getElementById('pastAppointmentsCount').textContent = pastDaysCount;
+        }
+
+        // Initial render of the table and summary when the page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            renderTable();
+            updateSummaryCounts();
+        });
+    </script>
+</body>
+</html>
