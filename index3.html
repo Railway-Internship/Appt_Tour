@@ -1,0 +1,1038 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tour Programme/Leave</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        /* Custom CSS Variables for a cohesive theme */
+        :root {
+            --primary-color: #1ABC9C; /* Changed to vibrant Teal Blue */
+            --secondary-color: #007bff; /* A standard blue for secondary elements */
+            --accent-color: #ffc107; /* A gold/yellow for highlights or alerts */
+            --background-light: #f8f9fa; /* Lighter background */
+            --card-background: #ffffff;
+            --dark-text: #212529; /* Darker text for better readability */
+            --medium-text: #495057; /* Medium gray for labels/descriptions */
+            --light-text: #adb5bd; /* Lighter gray for borders/placeholders */
+            --border-light: #dee2e6; /* Standard light border */
+            --table-header-bg: #e9ecef; /* Slightly darker light gray for table header */
+            
+            /* --- NEW MODERN MODAL COLORS & DESIGN --- */
+            --modal-gradient-start: #ECF0F1; /* Changed to Light Gray-Blue */
+            --modal-gradient-end: #ECF0F1; /* Changed to Light Gray-Blue */
+            --modal-heading-bg: #34495E; /* Changed to Darker Blue/Indigo */
+            --input-background: #ffffff; /* Pure white for inputs within modals */
+            /* --- END NEW MODERN MODAL COLORS & DESIGN --- */
+
+            --input-border: #ced4da; /* Standard input border */
+            --input-focus-border: #80bdff; /* Standard blue focus border */
+            --button-primary-bg: var(--primary-color);
+            --button-primary-hover-bg: #16A085; /* Darker shade of new primary color */
+            --button-secondary-bg: #6c757d; /* Gray for secondary button */
+            --button-secondary-hover-bg: #5a6268;
+            --view-btn-color: #17a2b8; /* Info blue for view */
+            --edit-btn-color: #ffc107; /* Yellow for edit */
+            --logout-btn-color: #dc3545; /* Red for logout */
+
+            /* Summary Card Specific Pastel Colors - Not very light */
+            --summary-blue-bg: #BBDEFB; /* Light Blue 200 */
+            --summary-blue-text: #1565c0; /* Blue 800 */
+
+            --summary-purple-bg: #E1BEE7; /* Light Purple 200 */
+            --summary-purple-text: #6A1B9A; /* Purple 800 */
+
+            --summary-peach-bg: #FFCCBC; /* Light Orange 200 / Peach */
+            --summary-peach-text: #D84315; /* Deep Orange 800 */
+
+            --summary-teal-bg: #B2DFDB; /* Light Teal 200 */
+            --summary-teal-text: #00695C; /* Teal 800 */
+
+            /* Status Badges - Pastel but visible */
+            --status-leave-bg: #ffe0b2; /* Light orange for leave */
+            --status-leave-text: #e65100; /* Darker orange text */
+            --status-duty-bg: #c8e6c9; /* Light green for duty */
+            --status-duty-text: #1b5e20; /* Darker green text */
+        }
+
+        body {
+            font-family: "Inter", sans-serif;
+            background-color: var(--background-light);
+            color: var(--dark-text);
+        }
+
+        /* Modal Overlay */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow-y: auto;
+            background-color: rgba(0,0,0,0.7); /* Softer overlay */
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(8px); /* Subtle blur */
+            padding: 1rem; /* Consistent padding */
+        }
+
+        /* Modal Content Box */
+        .modal-content {
+            background: linear-gradient(135deg, var(--modal-gradient-start) 0%, var(--modal-gradient-end) 100%);
+            padding: 0; /* Remove padding here, will add to inner elements */
+            border-radius: 1.5rem; /* More pronounced rounded corners (24px) */
+            box-shadow: 0 25px 50px rgba(0,0,0,0.2), 0 0 10px rgba(0,0,0,0.05) inset; /* Richer, multi-layer shadow */
+            width: 90%;
+            max-width: 550px; /* Slightly larger max-width for better content display */
+            position: relative;
+            transform: translateY(-50px) scale(0.95); /* Adjusted animation start */
+            opacity: 0;
+            transition: transform 0.6s cubic-bezier(0.22, 0.61, 0.36, 1), opacity 0.6s ease-in-out;
+            border: 1px solid rgba(220, 220, 220, 0.6); /* Soft, subtle border */
+            box-sizing: border-box;
+            max-height: 85vh; /* Ensure modal height is less than viewport height */
+            overflow-y: auto;
+        }
+
+        .modal.open .modal-content {
+            transform: translateY(0) scale(1);
+            opacity: 1;
+        }
+
+        /* Modal Heading Styling */
+        .modal-content h3 {
+            background-color: var(--modal-heading-bg); /* Changed to Darker Blue/Indigo */
+            color: white; /* Changed text color to white for contrast against blue heading */
+            padding: 1.2rem 3.5rem 1.2rem 2rem; /* Ample padding for heading: top, right (increased), bottom, left */
+            margin-bottom: 0; /* Remove default bottom margin */
+            border-top-left-radius: 1.4rem; /* Match modal border radius - slightly less to account for modal border */
+            border-top-right-radius: 1.4rem; /* Match modal border radius - slightly less to account for modal border */
+            font-size: 1.75rem; /* Adjusted font size to give more space */
+            font-weight: 700; /* Bolder font */
+            border-bottom: 1px solid rgba(0,0,0,0.08); /* Subtle separator line */
+            box-shadow: inset 0 -1px 3px rgba(0,0,0,0.03); /* Very subtle inner shadow */
+            line-height: 1.2; /* Adjust line height for better appearance with new font size */
+            display: flex; /* Enable flexbox for vertical alignment */
+            align-items: center; /* Vertically center content */
+            justify-content: space-between; /* Space out title and close button */
+            padding-right: 2rem; /* Adjust right padding to account for close button */
+        }
+
+        /* Modal Body Content Area */
+        .modal-content .modal-body-content {
+            padding: 2rem; /* Padding for the main content area */
+        }
+
+        /* Close Button - Completely redesigned based on new image */
+        .close-button {
+            color: var(--medium-text); /* Darker gray for visibility */
+            font-size: 1.5rem; /* Clear icon size */
+            font-weight: bold; /* Keep bold for the cross */
+            cursor: pointer;
+            transition: all 0.3s ease-in-out;
+            border-radius: 50%; /* Still circular */
+            width: 2rem; /* Adjusted size */
+            height: 2rem; /* Adjusted size */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #ffffff; /* Opaque white background */
+            border: 1px solid rgba(0, 0, 0, 0.15); /* More prominent, slightly darker border */
+            box-shadow: 0 1px 2px rgba(0,0,0,0.08); /* Softer, more subtle shadow */
+            text-decoration: none;
+            z-index: 1010;
+            outline: none; /* Remove focus outline */
+            margin-left: 1rem; /* Space from the title */
+        }
+        .close-button:hover,
+        .close-button:focus {
+            color: #dc3545; /* Danger red on hover */
+            background-color: #ffeff0; /* Very light red background on hover */
+            border-color: #dc3545; /* Red border on hover */
+            box-shadow: 0 2px 6px rgba(220, 53, 69, 0.25); /* More pronounced red shadow */
+            transform: scale(1.08); /* Gentle scale */
+        }
+
+        /* Form Labels */
+        .modal-content label {
+            font-weight: 600;
+            color: var(--medium-text);
+            margin-bottom: 0.2rem;
+            display: block;
+            font-size: 0.9rem;
+        }
+
+        /* Form Inputs - Different background for input sections */
+        .modal-content input[type="text"],
+        .modal-content input[type="datetime-local"],
+        .modal-content select,
+        .modal-content textarea {
+            border: 1px solid var(--input-border);
+            border-radius: 0.5rem; /* 8px rounded */
+            padding: 0.5rem 0.8rem; /* Adjusted padding */
+            background-color: var(--input-background); /* Pure white for inputs */
+            transition: all 0.3s ease-in-out;
+            width: 100%;
+            font-size: 0.95rem;
+            color: var(--dark-text);
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.05); /* Inner shadow for depth */
+        }
+        .modal-content input[type="text"]:focus,
+        .modal-content input[type="datetime-local"]:focus,
+        .modal-content select:focus,
+        .modal-content textarea:focus {
+            border-color: var(--input-focus-border);
+            outline: none;
+            box-shadow: 0 0 0 4px rgba(41, 128, 185, 0.2), inset 0 1px 3px rgba(0,0,0,0.08); /* Softer blue glow */
+            background-color: #ffffff; /* White on focus for clarity */
+        }
+
+        /* Modal Buttons */
+        .modal-content .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--button-primary-hover-bg) 100%);
+            color: white;
+            padding: 0.6rem 1.5rem;
+            border-radius: 0.6rem;
+            font-weight: 600;
+            transition: all 0.3s ease-in-out;
+            box-shadow: 0 4px 15px rgba(26, 188, 156, 0.3); /* Adjusted shadow for new primary color */
+            letter-spacing: 0.03em;
+            text-transform: uppercase;
+            border: none;
+            cursor: pointer;
+        }
+        .modal-content .btn-primary:hover {
+            background: linear-gradient(135deg, var(--button-primary-hover-bg) 0%, var(--primary-color) 100%);
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 6px 20px rgba(26, 188, 156, 0.4); /* Adjusted shadow for new primary color */
+        }
+
+        .modal-content .btn-secondary {
+            background-color: var(--button-secondary-bg);
+            color: white; 
+            padding: 0.6rem 1.5rem;
+            border-radius: 0.6rem;
+            font-weight: 600;
+            transition: all 0.3s ease-in-out;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            letter-spacing: 0.03em;
+            text-transform: uppercase;
+            border: none;
+            cursor: pointer;
+        }
+        .modal-content .btn-secondary:hover {
+            background-color: var(--button-secondary-hover-bg);
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+        }
+
+        /* Main Heading Container Styling */
+        .main-heading-container {
+            background: var(--secondary-color); /* Changed to solid blue */
+            color: white;
+            padding: 1.2rem 2.5rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+            font-size: 2.25rem;
+            font-weight: 700;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+            letter-spacing: 0.04em;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            transition: all 0.3s ease-in-out;
+            margin-bottom: 1.5rem;
+        }
+        .main-heading-container:hover {
+            transform: translateY(-3px) scale(1.005);
+            box-shadow: 0 10px 22px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Add Button inside heading */
+        #addTourLeaveBtn {
+            background-color: var(--accent-color); /* Accent yellow for add button */
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 1.5rem;
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            white-space: nowrap;
+            gap: 0.4rem;
+            transition: all 0.3s ease-in-out;
+            box-shadow: 0 2px 8px rgba(255, 193, 7, 0.3); /* Yellow shadow based on accent-color */
+            border: none;
+            cursor: pointer;
+        }
+        #addTourLeaveBtn:hover {
+            background-color: #e0a800; /* Darker yellow on hover */
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(255, 193, 7, 0.4);
+        }
+        #addTourLeaveBtn i {
+            font-size: 1rem;
+        }
+
+        /* Filter Section Styling */
+        .filter-section {
+            background-color: var(--table-header-bg);
+            padding: 1.5rem;
+            border-radius: 1rem;
+            box-shadow: inset 0 1px 5px rgba(0,0,0,0.05);
+            border: 1px solid var(--border-light);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+        .filter-section label {
+            color: var(--dark-text);
+            font-weight: 600;
+            font-size: 1rem;
+        }
+        .filter-section input[type="date"],
+        .filter-section input[type="text"] {
+            padding: 0.6rem 0.9rem;
+            border: 1px solid var(--input-border);
+            border-radius: 0.5rem;
+            background-color: var(--card-background);
+            font-size: 0.95rem;
+            color: var(--dark-text);
+            transition: all 0.3s ease;
+        }
+        .filter-section input[type="date"]:focus,
+        .filter-section input[type="text"]:focus {
+            outline: none;
+            border-color: var(--input-focus-border);
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.3); /* Blue glow based on secondary-color */
+        }
+        .filter-section button {
+            background-color: var(--secondary-color); /* Use secondary blue for filter buttons */
+            color: white;
+            padding: 0.6rem 1.2rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+            border: none;
+            cursor: pointer;
+        }
+        .filter-section button:hover {
+            background-color: #0069d9; /* Darker blue on hover */
+            transform: translateY(-1px);
+            box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+        }
+
+        /* Table Styling */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            border-radius: 1rem;
+            overflow: hidden;
+        }
+        thead {
+            background-color: var(--table-header-bg);
+        }
+        th {
+            padding: 1rem 1.5rem;
+            text-align: left;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--secondary-color); /* Text color for table headers */
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border-bottom: 1px solid var(--border-light);
+        }
+        tbody tr {
+            background-color: var(--card-background);
+            transition: background-color 0.2s ease;
+            border-bottom: 1px solid var(--border-light);
+        }
+        tbody tr:last-child {
+            border-bottom: none;
+        }
+        tbody tr:hover {
+            background-color: var(--background-light);
+        }
+        td {
+            padding: 1rem 1.5rem;
+            font-size: 0.9rem;
+            color: var(--dark-text);
+            white-space: nowrap;
+        }
+        /* Status Badges */
+        td span.rounded-full {
+            font-weight: 600;
+            font-size: 0.75rem;
+            padding: 0.25rem 0.7rem;
+            text-transform: capitalize;
+        }
+        /* Adjusted badge colors for better contrast */
+        .bg-orange-100 { background-color: var(--status-leave-bg); }
+        .text-orange-800 { color: var(--status-leave-text); }
+        .bg-green-100 { background-color: var(--status-duty-bg); }
+        .text-green-800 { color: var(--status-duty-text); }
+
+        /* Action Buttons in table */
+        .view-btn, .edit-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0.4rem;
+            border-radius: 0.4rem;
+            transition: all 0.2s ease-in-out;
+            color: inherit;
+        }
+        .view-btn {
+            color: var(--view-btn-color); /* Info blue */
+        }
+        .view-btn:hover {
+            color: #117a8b; /* Darker info blue */
+            background-color: rgba(23, 162, 184, 0.1);
+            transform: scale(1.1);
+        }
+        .edit-btn {
+            color: var(--edit-btn-color); /* Yellow for edit */
+        }
+        .edit-btn:hover {
+            color: #d39e00; /* Darker yellow */
+            background-color: rgba(255, 193, 7, 0.1);
+            transform: scale(1.1);
+        }
+        .action-icons {
+            font-size: 1.1rem;
+        }
+
+        /* Summary Section Styling */
+        .summary-card {
+            background: var(--card-background);
+            padding: 1.2rem;
+            border-radius: 0.8rem;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.1);
+            width: 100%;
+            transition: all 0.3s ease-in-out;
+            border: 1px solid var(--border-light);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        .summary-card:hover {
+            transform: translateY(-3px) scale(1.01);
+            box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+        }
+        .summary-card p.text-2xl {
+            font-size: 2.2rem;
+            font-weight: 800; /* Made text bolder */
+            margin-bottom: 0.3rem;
+            line-height: 1;
+        }
+        .summary-card p.text-sm {
+            font-size: 0.85rem;
+            color: var(--dark-text); /* Made text darker for better visibility */
+            font-weight: 600; /* Made text bolder */
+        }
+        /* Specific colors for summary cards - adjusted for normal appearance */
+        .summary-card.bg-blue-100 { background-color: var(--summary-blue-bg); }
+        .summary-card.text-blue-800 { color: var(--summary-blue-text); }
+        
+        /* New classes for distinct colors */
+        .summary-card.bg-purple-100 { background-color: var(--summary-purple-bg); }
+        .summary-card.text-purple-800 { color: var(--summary-purple-text); }
+
+        .summary-card.bg-peach-100 { background-color: var(--summary-peach-bg); }
+        .summary-card.text-peach-800 { color: var(--summary-peach-text); }
+
+        .summary-card.bg-teal-100 { background-color: var(--summary-teal-bg); }
+        .summary-card.text-teal-800 { color: var(--summary-teal-text); }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <header class="bg-white p-4 text-gray-800 flex items-center justify-between shadow-lg border-b border-gray-200">
+        <div class="flex items-center space-x-4">
+            <img src="https://placehold.co/50x50/F3F4F6/1F2937?text=ECR" alt="Logo" class="rounded-full border-2 border-gray-300">
+            <div>
+                <h1 class="text-2xl font-bold">पूर्व तट रेलवे</h1>
+                <p class="text-sm opacity-90">( EAST COAST RAILWAY )</p>
+            </div>
+        </div>
+        <div class="text-right flex items-center space-x-4">
+            <div>
+                <p class="text-sm">Welcome, Admin User</p>
+                <p class="text-sm font-semibold">ECR001</p>
+            </div>
+            <button class="bg-red-600 hover:bg-red-700 text-white font-semibold py-1.5 px-4 rounded-full shadow-md transition duration-300 ease-in-out transform hover:scale-105">Logout</button>
+        </div>
+    </header>
+
+    <main class="flex-grow p-8 bg-gray-100">
+        <div>
+            <div class="main-heading-container">
+                <h2 class="text-3xl font-extrabold text-white">Tour Programme/Leave</h2>
+                <button id="addTourLeaveBtn">
+                    <i class="fas fa-plus"></i>
+                    <span>Add Tour Program/Leave</span>
+                </button>
+            </div>
+
+            <div class="filter-section">
+                <label for="fromDate">From Date :</label>
+                <input type="date" id="fromDate">
+                <label for="toDate">To Date :</label>
+                <input type="date" id="toDate">
+                <label for="officerSearch">Officer Name :</label>
+                <input type="text" id="officerSearch" placeholder="Search by name...">
+                <button id="showFilterBtn">SHOW</button>
+                <button id="clearFilterBtn">CLEAR</button>
+            </div>
+
+            <div class="overflow-x-auto rounded-lg border border-gray-300 shadow-md">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Officer</th>
+                            <th>From</th>
+                            <th>To</th>
+                            <th>Out To</th>
+                            <th>Duty/Leave</th>
+                            <th>Purpose</th>
+                            <th>Edit</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tourLeaveTableBody">
+                        </tbody>
+                </table>
+                <div id="noDataMessage" class="hidden text-center py-4 text-gray-500">No tour/leave programs found for the selected dates.</div>
+            </div>
+
+            <div class="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 text-center">
+                <div class="summary-card bg-blue-100 text-blue-800">
+                    <p id="onDutyTodayCount" class="text-blue-800">0</p>
+                    <p class="text-sm">On Duty/Leave (Today)</p>
+                </div>
+                <div class="summary-card bg-purple-100 text-purple-800">
+                    <p id="onDutyTomorrowCount" class="text-purple-800">0</p>
+                    <p class="text-sm">Duty/Leave (Tomorrow)</p>
+                </div>
+                <div class="summary-card bg-peach-100 text-peach-800">
+                    <p id="futureDutyCount" class="text-peach-800">0</p>
+                    <p class="text-sm">Future Duty/Leave</p>
+                </div>
+                <div class="summary-card bg-teal-100 text-teal-800">
+                    <p id="pastDutyCount" class="text-teal-800">0</p>
+                    <p class="text-sm">Past Duty/Leave</p>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <div id="viewModal" class="modal">
+        <div class="modal-content">
+            <h3 class="text-2xl font-bold text-gray-800">Tour Programme/Leave Details<span class="close-button" onclick="closeModal(viewModal)">&times;</span></h3>
+            <div id="viewDetailsContent" class="modal-body-content space-y-4 text-gray-700 text-base">
+                </div>
+        </div>
+    </div>
+
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <h3 class="text-2xl font-bold text-gray-800">Edit Tour/Leave Program<span class="close-button" onclick="closeModal(editModal)">&times;</span></h3>
+            <form id="editForm" class="modal-body-content space-y-4">
+                <div>
+                    <label for="editOfficer">Officer's Name:</label>
+                    <input type="text" id="editOfficer" name="officer" class="mt-1 block w-full">
+                </div>
+                <div>
+                    <label for="editDesignation">Designation:</label>
+                    <input type="text" id="editDesignation" name="designation" class="mt-1 block w-full">
+                </div>
+                <div>
+                    <label for="editFromDate">Leaving HQ on:</label>
+                    <input type="datetime-local" id="editFromDate" name="fromDate" class="mt-1 block w-full">
+                </div>
+                <div>
+                    <label for="editToDate">Coming Back on:</label>
+                    <input type="datetime-local" id="editToDate" name="toDate" class="mt-1 block w-full">
+                </div>
+                <div>
+                    <label for="editOutTo">Going to:</label>
+                    <input type="text" id="editOutTo" name="outTo" class="mt-1 block w-full">
+                </div>
+                <div>
+                    <label for="editDutyLeave">Leave or Duty:</label>
+                    <select id="editDutyLeave" name="dutyLeave" class="mt-1 block w-full">
+                        <option value="Duty">Duty</option>
+                        <option value="Leave">Leave</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="editPurpose">Purpose:</label>
+                    <textarea id="editPurpose" name="purpose" rows="3" class="mt-1 block w-full"></textarea>
+                </div>
+                <div class="flex justify-end space-x-3 pt-4">
+                    <button type="button" class="btn-secondary" onclick="closeModal(editModal)">Cancel</button>
+                    <button type="submit" class="btn-primary">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="addModal" class="modal">
+        <div class="modal-content">
+            <h3 class="text-2xl font-bold text-gray-800">Add New Tour/Leave Program<span class="close-button" onclick="closeModal(addModal)">&times;</span></h3>
+            <form id="addForm" class="modal-body-content space-y-4">
+                <div>
+                    <label for="addOfficer">Officer's Name:</label>
+                    <input type="text" id="addOfficer" name="officer" class="mt-1 block w-full" required>
+                </div>
+                <div>
+                    <label for="addDesignation">Designation:</label>
+                    <input type="text" id="addDesignation" name="designation" class="mt-1 block w-full" required>
+                </div>
+                <div>
+                    <label for="addFromDate">Leaving HQ on:</label>
+                    <input type="datetime-local" id="addFromDate" name="fromDate" class="mt-1 block w-full" required>
+                </div>
+                <div>
+                    <label for="addToDate">Coming Back on:</label>
+                    <input type="datetime-local" id="addToDate" name="toDate" class="mt-1 block w-full" required>
+                </div>
+                <div>
+                    <label for="addOutTo">Going to:</label>
+                    <input type="text" id="addOutTo" name="outTo" class="mt-1 block w-full" required>
+                </div>
+                <div>
+                    <label for="addDutyLeave">Leave or Duty:</label>
+                    <select id="addDutyLeave" name="dutyLeave" class="mt-1 block w-full" required>
+                        <option value="Duty">Duty</option>
+                        <option value="Leave">Leave</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="addPurpose">Purpose:</label>
+                    <textarea id="addPurpose" name="purpose" rows="3" class="mt-1 block w-full" required></textarea>
+                </div>
+                <div class="flex justify-end space-x-3 pt-4">
+                    <button type="button" class="btn-secondary" onclick="closeModal(addModal)">Cancel</button>
+                    <button type="submit" class="btn-primary">Add Program</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Sample data for demonstration
+        let tourLeavePrograms = [
+            {
+                id: 1,
+                officer: "CWE",
+                designation: "Chief Works Engineer", // Added designation
+                fromDate: "2025-05-25T05:30",
+                toDate: "2025-06-02T05:30",
+                outTo: "THAILAND",
+                dutyLeave: "Leave",
+                purpose: "Awaiting Ex-India Leave"
+            },
+            {
+                id: 2,
+                officer: "CERD",
+                designation: "Chief Engineer Research & Development", // Added designation
+                fromDate: "2025-05-31T05:30",
+                toDate: "2025-06-06T05:30",
+                outTo: "Local",
+                dutyLeave: "Leave",
+                purpose: "Awaiting Leave ( L/A CPEE )"
+            },
+            {
+                id: 3,
+                officer: "DSTE/Proj .",
+                designation: "Divisional Signal & Telecom Engineer / Projects", // Added designation
+                fromDate: "2025-05-31T05:30",
+                toDate: "2025-06-02T05:30",
+                outTo: "VZM",
+                dutyLeave: "Duty",
+                purpose: "PM NI of VZM"
+            },
+            {
+                id: 4,
+                officer: "CESE/PL",
+                designation: "Chief Electrical Signal Engineer / Planning", // Added designation
+                fromDate: "2025-05-31T05:30",
+                toDate: "2025-06-05T05:30",
+                outTo: "Local",
+                dutyLeave: "Leave",
+                purpose: "Awaiting leave"
+            },
+            {
+                id: 5,
+                officer: "PCMD",
+                designation: "Principal Chief Medical Director", // Added designation
+                fromDate: "2025-06-01T05:30",
+                toDate: "2025-06-03T05:30",
+                outTo: "NOLS",
+                dutyLeave: "Duty",
+                purpose: "To attend PCMD Annual Performance Rev . Meeting in Rly . Bd ."
+            },
+            {
+                id: 6,
+                officer: "CTPM",
+                designation: "Chief Traffic Planning Manager", // Added designation
+                fromDate: "2025-06-01T05:30",
+                toDate: "2025-06-03T05:30",
+                outTo: "NOLS",
+                dutyLeave: "Duty",
+                purpose: "To attend meeting in Rly . Board ."
+            },
+            {
+                id: 7,
+                officer: "PCSC",
+                designation: "Principal Chief Security Commissioner", // Added designation
+                fromDate: "2025-06-02T05:30",
+                toDate: "2025-06-04T05:30",
+                outTo: "VSKP/CHE",
+                dutyLeave: "Duty",
+                purpose: "Mtg . with DRWMAT , Attending Suraksha Sammelan & Inspctn ."
+            },
+            {
+                id: 8,
+                officer: "PCSC",
+                designation: "Principal Chief Security Commissioner", // Added designation
+                fromDate: "2025-06-06T05:30",
+                toDate: "2025-06-06T05:30",
+                outTo: "KUR",
+                dutyLeave: "Duty",
+                purpose: "Attending Suraksha Sammelan & Inspection"
+            },
+        ];
+
+        // Get modal elements
+        const viewModal = document.getElementById('viewModal');
+        const editModal = document.getElementById('editModal');
+        const addModal = document.getElementById('addModal');
+
+        // Get buttons
+        const addTourLeaveBtn = document.getElementById('addTourLeaveBtn');
+        const tourLeaveTableBody = document.getElementById('tourLeaveTableBody');
+        const showFilterBtn = document.getElementById('showFilterBtn');
+        const clearFilterBtn = document.getElementById('clearFilterBtn');
+        const fromDateInput = document.getElementById('fromDate');
+        const toDateInput = document.getElementById('toDate');
+        const officerSearchInput = document.getElementById('officerSearch'); // New search input
+        const noDataMessage = document.getElementById('noDataMessage');
+
+        // Get forms
+        const editForm = document.getElementById('editForm');
+        const addForm = document.getElementById('addForm');
+
+        let currentEditId = null; // To store the ID of the program being edited
+
+        // Function to open a modal
+        function openModal(modal) {
+            modal.style.display = 'flex';
+            // Add a class to trigger the animation
+            setTimeout(() => {
+                modal.classList.add('open');
+            }, 50); // Small delay to ensure display:flex is applied first
+        }
+
+        // Function to close a modal
+        function closeModal(modal) {
+            // Remove the class to reverse the animation
+            modal.classList.remove('open');
+            modal.addEventListener('transitionend', function handler() {
+                modal.style.display = 'none';
+                modal.removeEventListener('transitionend', handler);
+            });
+        }
+
+        // Close modals when clicking outside
+        window.addEventListener('click', (event) => {
+            if (event.target === viewModal) {
+                closeModal(viewModal);
+            }
+            if (event.target === editModal) {
+                closeModal(editModal);
+            }
+            if (event.target === addModal) {
+                closeModal(addModal);
+            }
+        });
+
+        // Function to render table rows
+        function renderTable(programsToRender = tourLeavePrograms) {
+            tourLeaveTableBody.innerHTML = ''; // Clear existing rows
+            if (programsToRender.length === 0) {
+                noDataMessage.classList.remove('hidden');
+            } else {
+                noDataMessage.classList.add('hidden');
+            }
+
+            programsToRender.forEach(program => {
+                const row = document.createElement('tr');
+                row.classList.add('hover:bg-gray-50');
+
+                // Enhanced color for Duty/Leave status
+                const dutyLeaveColorClass = program.dutyLeave === 'Leave' ? 'bg-orange-100 text-orange-800' : 'bg-green-100 text-green-800'; /* Orange for Leave, Green for Duty */
+
+                row.innerHTML = `
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800">${program.officer}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800">${program.fromDate.replace('T', ' ')}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800">${program.toDate.replace('T', ' ')}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800">${program.outTo}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm">
+                        <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${dutyLeaveColorClass}">${program.dutyLeave}</span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800">${program.purpose}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
+                        <button class="view-btn" data-id="${program.id}"><i class="fas fa-eye action-icons"></i></button>
+                        <button class="edit-btn" data-id="${program.id}"><i class="fas fa-pencil-alt action-icons"></i></button>
+                    </td>
+                `;
+                tourLeaveTableBody.appendChild(row);
+            });
+
+            attachTableButtonListeners();
+            updateSummaryCounts(); // Update summary counts after rendering table
+        }
+
+        // Attach listeners to dynamically created buttons
+        function attachTableButtonListeners() {
+            document.querySelectorAll('.view-btn').forEach(button => {
+                button.removeEventListener('click', handleViewClick); // Prevent duplicate listeners
+                button.addEventListener('click', handleViewClick);
+            });
+
+            document.querySelectorAll('.edit-btn').forEach(button => {
+                button.removeEventListener('click', handleEditClick); // Prevent duplicate listeners
+                button.addEventListener('click', handleEditClick);
+            });
+        }
+
+        // Handle View Button Click
+        function handleViewClick(event) {
+            const programId = parseInt(event.currentTarget.dataset.id);
+            const program = tourLeavePrograms.find(p => p.id === programId);
+
+            if (program) {
+                const viewDetailsContent = document.getElementById('viewDetailsContent');
+                // Updated layout for view details with more descriptive labels and consistent styling
+                viewDetailsContent.innerHTML = `
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-y-3 gap-x-5">
+                        <div class="flex items-center space-x-3">
+                            <i class="fas fa-user-tie text-gray-600 text-xl"></i>
+                            <div>
+                                <p class="text-sm font-medium text-gray-500">Officer's Name:</p>
+                                <p class="text-base font-semibold text-gray-800">${program.officer}</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <i class="fas fa-id-badge text-gray-600 text-xl"></i>
+                            <div>
+                                <p class="text-sm font-medium text-gray-500">Designation:</p>
+                                <p class="text-base font-semibold text-gray-800">${program.designation || 'N/A'}</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <i class="fas fa-calendar-alt text-gray-600 text-xl"></i>
+                            <div>
+                                <p class="text-sm font-medium text-gray-500">Leaving HQ on:</p>
+                                <p class="text-base font-semibold text-gray-800">${program.fromDate.replace('T', ' ')}</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <i class="fas fa-calendar-check text-gray-600 text-xl"></i>
+                            <div>
+                                <p class="text-sm font-medium text-gray-500">Coming Back on:</p>
+                                <p class="text-base font-semibold text-gray-800">${program.toDate.replace('T', ' ')}</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <i class="fas fa-map-marker-alt text-gray-600 text-xl"></i>
+                            <div>
+                                <p class="text-sm font-medium text-gray-500">Going to:</p>
+                                <p class="text-base font-semibold text-gray-800">${program.outTo}</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <i class="fas fa-briefcase text-gray-600 text-xl"></i>
+                            <div>
+                                <p class="text-sm font-medium text-gray-500">Leave or Duty:</p>
+                                <p class="text-base font-semibold text-gray-800"><span class="px-3 py-1 text-xs leading-5 font-semibold rounded-full ${program.dutyLeave === 'Leave' ? 'bg-orange-100 text-orange-800' : 'bg-green-100 text-green-800'}">${program.dutyLeave}</span></p>
+                            </div>
+                        </div>
+                        <div class="md:col-span-2 flex items-start space-x-3">
+                            <i class="fas fa-info-circle text-gray-600 text-xl pt-1"></i>
+                            <div>
+                                <p class="text-sm font-medium text-gray-500">Purpose:</p>
+                                <p class="text-base font-semibold text-gray-800">${program.purpose}</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                openModal(viewModal);
+            }
+        }
+
+        // Handle Edit Button Click
+        function handleEditClick(event) {
+            const programId = parseInt(event.currentTarget.dataset.id);
+            const program = tourLeavePrograms.find(p => p.id === programId);
+
+            if (program) {
+                currentEditId = programId;
+                document.getElementById('editOfficer').value = program.officer;
+                document.getElementById('editDesignation').value = program.designation || ''; // Populate designation
+                document.getElementById('editFromDate').value = program.fromDate;
+                document.getElementById('editToDate').value = program.toDate;
+                document.getElementById('editOutTo').value = program.outTo;
+                document.getElementById('editDutyLeave').value = program.dutyLeave;
+                document.getElementById('editPurpose').value = program.purpose;
+                openModal(editModal);
+            }
+        }
+
+        // Handle Add Tour/Leave Button Click
+        addTourLeaveBtn.addEventListener('click', () => {
+            addForm.reset(); // Clear any previous input
+            // Reset designation field specifically if it's new
+            document.getElementById('addDesignation').value = '';
+            openModal(addModal);
+        });
+
+        // Handle Edit Form Submission
+        editForm.addEventListener('submit', (event) => {
+            event.preventDefault(); // Prevent default form submission
+
+            const updatedProgram = {
+                id: currentEditId,
+                officer: document.getElementById('editOfficer').value,
+                designation: document.getElementById('editDesignation').value, // Save designation
+                fromDate: document.getElementById('editFromDate').value,
+                toDate: document.getElementById('editToDate').value,
+                outTo: document.getElementById('editOutTo').value,
+                dutyLeave: document.getElementById('editDutyLeave').value,
+                purpose: document.getElementById('editPurpose').value
+            };
+
+            // Find and update the program in the array
+            const index = tourLeavePrograms.findIndex(p => p.id === currentEditId);
+            if (index !== -1) {
+                tourLeavePrograms[index] = updatedProgram;
+                renderTable(); // Re-render the table with updated data
+                closeModal(editModal);
+            }
+        });
+
+        // Handle Add Form Submission
+        addForm.addEventListener('submit', (event) => {
+            event.preventDefault(); // Prevent default form submission
+
+            const newProgram = {
+                id: tourLeavePrograms.length > 0 ? Math.max(...tourLeavePrograms.map(p => p.id)) + 1 : 1, // Generate new ID
+                officer: document.getElementById('addOfficer').value,
+                designation: document.getElementById('addDesignation').value, // Save designation
+                fromDate: document.getElementById('addFromDate').value,
+                toDate: document.getElementById('addToDate').value,
+                outTo: document.getElementById('addOutTo').value,
+                dutyLeave: document.getElementById('addDutyLeave').value,
+                purpose: document.getElementById('addPurpose').value
+            };
+
+            tourLeavePrograms.push(newProgram); // Add new program to the array
+            renderTable(); // Re-render the table with new data
+            closeModal(addModal);
+        });
+
+        // Date & Officer Filtering Logic
+        function applyFilters() {
+            const fromDateStr = fromDateInput.value;
+            const toDateStr = toDateInput.value;
+            const officerSearchTerm = officerSearchInput.value.toLowerCase();
+
+            let filteredPrograms = tourLeavePrograms;
+
+            if (fromDateStr && toDateStr) {
+                const filterFromDate = new Date(fromDateStr);
+                const filterToDate = new Date(toDateStr);
+                filterToDate.setHours(23, 59, 59, 999); // Include the whole "to date"
+
+                filteredPrograms = filteredPrograms.filter(program => {
+                    const programFromDate = new Date(program.fromDate);
+                    const programToDate = new Date(program.toDate);
+                    programFromDate.setHours(0, 0, 0, 0);
+                    programToDate.setHours(0, 0, 0, 0);
+
+                    return (programFromDate <= filterToDate && programToDate >= filterFromDate);
+                });
+            }
+
+            if (officerSearchTerm) {
+                filteredPrograms = filteredPrograms.filter(program =>
+                    program.officer.toLowerCase().includes(officerSearchTerm) ||
+                    program.designation.toLowerCase().includes(officerSearchTerm)
+                );
+            }
+            renderTable(filteredPrograms);
+        }
+
+        showFilterBtn.addEventListener('click', applyFilters);
+
+        clearFilterBtn.addEventListener('click', () => {
+            fromDateInput.value = '';
+            toDateInput.value = '';
+            officerSearchInput.value = '';
+            renderTable(); // Render all programs
+        });
+
+        // Summary Counts Logic
+        function updateSummaryCounts() {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const tomorrow = new Date(today);
+            tomorrow.setDate(tomorrow.getDate() + 1);
+
+            let onDutyToday = 0;
+            let onDutyTomorrow = 0;
+            let futureDuty = 0;
+            let pastDuty = 0;
+
+            tourLeavePrograms.forEach(program => {
+                const programFromDate = new Date(program.fromDate);
+                const programToDate = new Date(program.toDate);
+                programFromDate.setHours(0, 0, 0, 0);
+                programToDate.setHours(0, 0, 0, 0);
+
+                if (programFromDate <= today && programToDate >= today) {
+                    onDutyToday++;
+                } else if (programFromDate <= tomorrow && programToDate >= tomorrow) {
+                    onDutyTomorrow++;
+                } else if (programFromDate > tomorrow) {
+                    futureDuty++;
+                } else if (programToDate < today) {
+                    pastDuty++;
+                }
+            });
+
+            document.getElementById('onDutyTodayCount').textContent = onDutyToday;
+            document.getElementById('onDutyTomorrowCount').textContent = onDutyTomorrow;
+            document.getElementById('futureDutyCount').textContent = futureDuty;
+            document.getElementById('pastDutyCount').textContent = pastDuty;
+        }
+
+        // Initial render of the table and summary when the page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            renderTable();
+            updateSummaryCounts();
+        });
+    </script>
+</body>
+</html>
